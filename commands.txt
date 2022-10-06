@@ -1,0 +1,12 @@
+let t = await StepUpToken.deployed()
+let bal = await t.balanceOf(accounts[0])
+bal.toString()
+let s = await StepUpTokenSale.deployed()
+t.approve(s.address,bal)
+or you can use
+t.approve(s.address,web3.utils.toWei("1000","ether"));
+s.buyTokens({from: accounts[1], value: web3.utils.toWei("1","ether")})
+bal = await t.balanceOf(accounts[1])
+bal.toString()
+bal = await t.balanceOf(accounts[0])
+bal.toString()
