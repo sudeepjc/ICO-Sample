@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>My First dApp</title>
+        <style>
+            body {
+                text-align: center;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            div {
+                width: 20%;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+                margin: 10px 0px 5px 0px;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h1>Buyer Zone</h1>
+            <p>Here we get to buy the tokens.. </p>
+            <button onclick="getPrice()">Get Price</button>
+            <label for="currentPrice" id="currentPrice"> </label> <br />
+            <label for="purchaseAmount">Input amount of Eth you are ready to spend:</label> 
+            <input type="text" id="purchaseAmount" />
+            <button onclick="buy()">Buy</button>
+        </div>
+    </body>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.1/ethers.umd.js"
+        type="application/javascript"
+    ></script>
+
+    <script>
+        
+        
+        let StepUpTokenSaleContract;
+        let signer;
+        let provider;
+        let accounts;
+        let StepUpTokenSaleContractABI;
+        let StepUpTokenSaleContractAddress;
+        
+        // async function doInit() {
+        //     StepUpTokenSaleContractAddress = "'0xD711817192CEF68CF171d4a5dE71dca824acF23D'";
+        //     StepUpTokenSaleContractABI = [
+        //     {
+        //     	"inputs": [
+        //     		{
+        //     			"internalType": "address",
+        //     			"name": "_owner",
+        //     			"type": "address"
+        //     		},
+        //     		{
+        //     			"internalType": "address",
+        //     			"name": "_token",
+        //     			"type": "address"
+        //     		}
+        //     	],
+        //     	"stateMutability": "nonpayable",
+        //     	"type": "constructor"
+        //     },
+        //     {
+        //     	"anonymous": false,
+        //     	"inputs": [
+        //     		{
+        //     			"indexed": true,
+        //     			"internalType": "address",
+        //     			"name": "buyer",
+        //     			"type": "address"
+        //     		},
+        //     		{
+        //     			"indexed": true,
+        //     			"internalType": "uint256",
+        //     			"name": "saleCount",
+        //     			"type": "uint256"
+        //     		}
+        //     	],
+        //     	"name": "TokenSale",
+        //     	"type": "event"
+        //     },
+        //     {
+        //     	"anonymous": false,
+        //     	"inputs": [
+        //     		{
+        //     			"indexed": true,
+        //     			"internalType": "address",
+        //     			"name": "buyer",
+        //     			"type": "address"
+        //     		},
+        //     		{
+        //     			"indexed": true,
+        //     			"internalType": "uint256",
+        //     			"name": "saleCount",
+        //     			"type": "uint256"
+        //     		}
+        //     	],
+        //     	"name": "TokenSaleFailed",
+        //     	"type": "event"
+        //     },
+        //     {
+        //     	"inputs": [],
+        //     	"name": "buyTokens",
+        //     	"outputs": [],
+        //     	"stateMutability": "payable",
+        //     	"type": "function"
+        //     },
+        //     {
+        //     	"inputs": [],
+        //     	"name": "owner",
+        //     	"outputs": [
+        //     		{
+        //     			"internalType": "address",
+        //     			"name": "",
+        //     			"type": "address"
+        //     		}
+        //     	],
+        //     	"stateMutability": "view",
+        //     	"type": "function"
+        //     },
+        //     {
+        //     	"inputs": [],
+        //     	"name": "pricePerEth",
+        //     	"outputs": [
+        //     		{
+        //     			"internalType": "uint256",
+        //     			"name": "",
+        //     			"type": "uint256"
+        //     		}
+        //     	],
+        //     	"stateMutability": "view",
+        //     	"type": "function"
+        //     },
+        //     {
+        //     	"inputs": [],
+        //     	"name": "token",
+        //     	"outputs": [
+        //     		{
+        //     			"internalType": "contract IERC20",
+        //     			"name": "",
+        //     			"type": "address"
+        //     		}
+        //     	],
+        //     	"stateMutability": "view",
+        //     	"type": "function"
+        //     }   
+        // ]    
+        //     provider = new ethers.providers.JsonRpcProvider("http://localhost:7545");
+        //     console.log(provider);
+        //     accounts = await provider.listAccounts();
+        //     console.log(accounts);
+            
+        //     signer = await provider.getSigner(accounts[1]);
+        //     console.log(signer);
+
+        //     console.log(StepUpTokenSaleContractAddress);
+        //     console.log(StepUpTokenSaleContractABI);
+            
+        //     StepUpTokenSaleContract = new ethers.Contract( StepUpTokenSaleContractAddress, StepUpTokenSaleContractABI, signer);
+        // }
+
+        
+        // doInit();
+
+        async function getPrice() {
+            const price = await StepUpTokenSaleContract.pricePerEth();
+            console.log(price.toString());
+			alert(price.toString);
+            document.getElementById("currentPrice").setAttribute('value',price.toString()) ;
+        }
+
+        async function buy() {
+            signer = await provider.getSigner(accounts[1]);
+            console.log(signer);
+            StepUpTokenSaleContract = new ethers.Contract( StepUpTokenSaleContractAddress, StepUpTokenSaleContractABI, signer);
+            const amount = document.getElementById("purchaseAmount").value;
+            let bigAmount = ethers.BigNumber.from(amount).mul(ethers.BigNumber.from("1000000000000000000"));
+            await StepUpTokenSaleContract.buyTokens({value: bigAmount});
+        }
+
+        async function doInitMetamask() {
+            StepUpTokenSaleContractAddress = "0xe1c0BF494DAC16fE8BC18D21CAE6cFD3A8664e9A";
+            StepUpTokenSaleContractABI = [
+                    {
+                    	"inputs": [
+                    		{
+                    			"internalType": "address",
+                    			"name": "_owner",
+                    			"type": "address"
+                    		},
+                    		{
+                    			"internalType": "address",
+                    			"name": "_token",
+                    			"type": "address"
+                    		}
+                    	],
+                    	"stateMutability": "nonpayable",
+                    	"type": "constructor"
+                    },
+                    {
+                    	"anonymous": false,
+                    	"inputs": [
+                    		{
+                    			"indexed": true,
+                    			"internalType": "address",
+                    			"name": "buyer",
+                    			"type": "address"
+                    		},
+                    		{
+                    			"indexed": true,
+                    			"internalType": "uint256",
+                    			"name": "saleCount",
+                    			"type": "uint256"
+                    		}
+                    	],
+                    	"name": "TokenSale",
+                    	"type": "event"
+                    },
+                    {
+                    	"anonymous": false,
+                    	"inputs": [
+                    		{
+                    			"indexed": true,
+                    			"internalType": "address",
+                    			"name": "buyer",
+                    			"type": "address"
+                    		},
+                    		{
+                    			"indexed": true,
+                    			"internalType": "uint256",
+                    			"name": "saleCount",
+                    			"type": "uint256"
+                    		}
+                    	],
+                    	"name": "TokenSaleFailed",
+                    	"type": "event"
+                    },
+                    {
+                    	"inputs": [],
+                    	"name": "buyTokens",
+                    	"outputs": [],
+                    	"stateMutability": "payable",
+                    	"type": "function"
+                    },
+                    {
+                    	"inputs": [],
+                    	"name": "owner",
+                    	"outputs": [
+                    		{
+                    			"internalType": "address",
+                    			"name": "",
+                    			"type": "address"
+                    		}
+                    	],
+                    	"stateMutability": "view",
+                    	"type": "function"
+                    },
+                    {
+                    	"inputs": [],
+                    	"name": "pricePerEth",
+                    	"outputs": [
+                    		{
+                    			"internalType": "uint256",
+                    			"name": "",
+                    			"type": "uint256"
+                    		}
+                    	],
+                    	"stateMutability": "view",
+                    	"type": "function"
+                    },
+                    {
+                    	"inputs": [],
+                    	"name": "token",
+                    	"outputs": [
+                    		{
+                    			"internalType": "contract IERC20",
+                    			"name": "",
+                    			"type": "address"
+                    		}
+                    	],
+                    	"stateMutability": "view",
+                    	"type": "function"
+                    }   
+                ]
+
+            provider = new ethers.providers.Web3Provider(web3.currentProvider);
+
+            try {
+                await provider.send("eth_requestAccounts", []);
+            } catch {
+                console.log("Connection error");
+            }
+
+            accounts = await provider.listAccounts();
+            console.log(accounts);
+            
+            signer = await provider.getSigner(accounts[0]);
+            console.log(signer);
+
+            console.log(StepUpTokenSaleContractAddress);
+            console.log(StepUpTokenSaleContractABI);
+            
+            StepUpTokenSaleContract = new ethers.Contract( StepUpTokenSaleContractAddress, StepUpTokenSaleContractABI, signer);
+        }
+        doInitMetamask();
+    </script>
+</html>
